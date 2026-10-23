@@ -1,3 +1,5 @@
+Base repository: [EkatherinaS/itmo-gl-hw-2026](https://github.com/EkatherinaS/itmo-gl-hw-2026)
+
 ![build_cmake_status](https://github.com/sadads1337/mse-gl-hw-template/actions/workflows/build_cmake.yml/badge.svg)
 
 # ITMO OpenGL homework template 2026
