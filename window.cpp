@@ -96,10 +96,19 @@ void Window::onInit()
 
     // Start timer for animation (if needed)
     timer_.start();
+
+    // Еnable depth test and face culling
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
+
+    // Clear all FBO buffers
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 void Window::onRender()
 {
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
     // Calculate MVP matrix
     model_.setToIdentity();
     model_.translate(0, 0, -1.5);
