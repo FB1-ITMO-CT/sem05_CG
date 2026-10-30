@@ -1,5 +1,6 @@
 #include "window.h"
 
+#include <array>
 #include <QLabel>
 
 constexpr std::array<GLfloat, 21u> vertices = {

@@ -1,15 +1,20 @@
 cmake_minimum_required(VERSION 3.16)
 project(itmo-gl-hw-2026 LANGUAGES CXX)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets OpenGLWidgets)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets OpenGLWidgets)
+if(QT_VERSION_MAJOR EQUAL 6)
+    find_package(Qt6 REQUIRED COMPONENTS Widgets OpenGL OpenGLWidgets)
+    set(QT_OPENGL_TARGET Qt6::OpenGLWidgets)
+else()
+    find_package(Qt5 REQUIRED COMPONENTS Widgets OpenGL)
+    set(QT_OPENGL_TARGET Qt5::OpenGL)
+endif()
 
 set(PROJECT_SOURCES
         main.cpp
@@ -26,4 +31,4 @@ add_executable(itmo-gl-hw-2026
     openglwidget.h openglwidget.cpp
 )
 
-target_link_libraries(itmo-gl-hw-2026 PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::OpenGLWidgets)
+target_link_libraries(itmo-gl-hw-2026 PRIVATE Qt::Widgets ${QT_OPENGL_TARGET})
