@@ -2,6 +2,7 @@
 
 #include <array>
 #include <QLabel>
+#include <qevent.h>
 
 struct vertex
 {
@@ -41,6 +42,8 @@ Window::~Window()
 
 void Window::onInit()
 {
+  setMouseTracking(true);
+
   // Configure shaders
   program_ = std::make_unique<QOpenGLShaderProgram>(this);
   program_->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/template.vs");
@@ -98,10 +101,19 @@ void Window::onRender()
   // Bind shader program
   program_->bind();
 
-  if (animated_ && сolorAnimated_)
+  if (FractalInfoUpdated)
   {
-    const float dt = timer_.restart() / 1000.0f;
+    FractalZoom = std::exp(static_cast<float>(FractalZoomCounter) * FractalZoomFactor);
+    FractalExtent = AspectRatio * FractalZoom;
+
+    FractalInfoUpdated = false;
+  }
+  program_->setUniformValue(3, FractalCenter.x(), FractalCenter.y(), FractalExtent.x(), FractalExtent.y());
+
+  {
+    const auto dt {timer_.restart() / 1000.0f};
     hue_ = std::fmod(hue_ + dt * (60.0f / 360.0f), 1.0f);
+
     program_->setUniformValue(2, QColor::fromHsvF(hue_, 1.0, 1.0));
   }
 
@@ -120,12 +132,61 @@ void Window::onRender()
   program_->release();
   texture_->release();
 
-  if (animated_)
-    update();
+  update();
 }
 
-void Window::onResize(const size_t width, const size_t height)
+void Window::onResize(const size_t W, const size_t H)
 {
-  // Configure viewport
-  glViewport(0, 0, static_cast<GLint>(width), static_cast<GLint>(height));
+  Resolution = {static_cast<float>(W), static_cast<float>(H)};
+
+  AspectRatio = Resolution / std::min(Resolution.x(), Resolution.y());
+  FractalInfoUpdated = true;
+
+  glViewport(0, 0, static_cast<GLint>(W), static_cast<GLint>(H));
+}
+
+void Window::keyPressEvent(QKeyEvent *Event)
+{
+  QOpenGLWidget::keyPressEvent(Event);
+}
+
+void Window::mousePressEvent(QMouseEvent *Event)
+{
+  QOpenGLWidget::mousePressEvent(Event);
+}
+
+void Window::mouseMoveEvent(QMouseEvent *Event)
+{
+  if (LastMousePos != LastMousePos) // Evil trickery
+    LastMousePos = Event->windowPos();
+
+  if (Event->buttons() & Qt::LeftButton)
+  {
+    QPointF Delta = Event->windowPos() - LastMousePos;
+    QVector2D VDelta {static_cast<float>(-Delta.x()), static_cast<float>(Delta.y())};
+
+    FractalCenter += VDelta / Resolution * 2 * FractalExtent;
+    FractalInfoUpdated = true;
+  }
+
+  LastMousePos = Event->windowPos();
+
+  QOpenGLWidget::mouseMoveEvent(Event);
+}
+
+void Window::wheelEvent(QWheelEvent *Event)
+{
+  float Delta;
+
+  if (QPoint PixelDelta {Event->pixelDelta()}; !PixelDelta.isNull())
+    Delta = PixelDelta.y();
+  else if (QPoint AngleDelta {Event->angleDelta()}; !AngleDelta.isNull())
+    Delta = AngleDelta.y();
+
+  Delta *= -(1.f / 120.f);
+
+  FractalZoomCounter = std::clamp<float>(FractalZoomCounter + Delta, -1024, 1024);
+  FractalInfoUpdated = true;
+
+  QOpenGLWidget::wheelEvent(Event);
 }

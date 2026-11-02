@@ -8,6 +8,7 @@
 layout(location = 0) uniform sampler2D tex_2d;
 layout(location = 1) uniform vec2 aspect_ratio;
 layout(location = 2) uniform vec4 color;
+layout(location = 3) uniform vec4 center_n_extent;
 
 /* Direct inputs */
 layout(location = 0) in vec2 _in_pos;
@@ -19,7 +20,10 @@ layout(location = 0) out vec4 _out_col;
 /* Code */
 void main()
 {
-  vec2 vert_tex = (_in_pos + 1) / 2;
+  vec2 center = center_n_extent.xy;
+  vec2 extent = center_n_extent.zw;
+
+  vec2 vert_tex = center + extent * _in_pos;
   vec3 vert_col = vec3(0.5, 0.5, 0.5);
 
   // TODO: Replace with fractal
