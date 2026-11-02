@@ -90,18 +90,11 @@ void Window::onRender()
   // Bind shader program
   program_->bind();
 
-  if (FractalInfoUpdated)
-  {
-    FractalZoom = std::exp(static_cast<float>(FractalZoomCounter) * FractalZoomFactor);
-    FractalExtent = AspectRatio * FractalZoom;
-
-    TexelSize = FractalExtent * 2 / Resolution;
-
-    FractalInfoUpdated = false;
-  }
-
   program_->setUniformValue(0, FractalCenter.x(), FractalCenter.y(), FractalExtent.x(), FractalExtent.y());
+
   program_->setUniformValue(1, 1.f, 3.0f, 0.f);
+
+  TexelSize = FractalExtent * 2 / Resolution;
   program_->setUniformValue(2, TexelSize.x(), TexelSize.y());
 
   // Bind VAO
@@ -122,7 +115,7 @@ void Window::onResize(const size_t W, const size_t H)
   Resolution = {static_cast<float>(W), static_cast<float>(H)};
 
   AspectRatio = Resolution / std::min(Resolution.x(), Resolution.y());
-  FractalInfoUpdated = true;
+  FractalExtent = AspectRatio * FractalZoom;
 
   glViewport(0, 0, static_cast<GLint>(W), static_cast<GLint>(H));
 }
@@ -148,7 +141,7 @@ void Window::mouseMoveEvent(QMouseEvent *Event)
     QVector2D VDelta {static_cast<float>(-Delta.x()), static_cast<float>(Delta.y())};
 
     FractalCenter += VDelta / Resolution * 2 * FractalExtent;
-    FractalInfoUpdated = true;
+    FractalExtent = AspectRatio * FractalZoom;
   }
 
   LastMousePos = Event->windowPos();
@@ -167,8 +160,24 @@ void Window::wheelEvent(QWheelEvent *Event)
 
   Delta *= -(1.f / 120.f);
 
+  QVector2D Mouse {static_cast<float>(LastMousePos.x()), static_cast<float>(LastMousePos.y())};
+  Mouse = Mouse * 2 / Resolution - QVector2D {1.f, 1.f};
+  Mouse = Mouse * AspectRatio * FractalExtent;
+
+  const auto BaseMouse {Mouse};
+  Mouse /= FractalZoom;
+
   FractalZoomCounter = std::clamp<float>(FractalZoomCounter + Delta, -1024, 1024);
-  FractalInfoUpdated = true;
+  FractalZoom = std::exp(static_cast<float>(FractalZoomCounter) * FractalZoomFactor);
+
+  Mouse *= FractalZoom;
+
+  auto MouseDelta {BaseMouse - Mouse};
+  MouseDelta.setY(-MouseDelta.y());
+
+  FractalCenter += MouseDelta;
+
+  FractalExtent = AspectRatio * FractalZoom;
 
   QOpenGLWidget::wheelEvent(Event);
 }

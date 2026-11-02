@@ -41,7 +41,6 @@ private:
   float FractalZoom {1.f};
   QVector2D FractalCenter {0.f, 0.f};
   QVector2D FractalExtent;
-  bool FractalInfoUpdated {true};
 
   QOpenGLBuffer vbo_ {QOpenGLBuffer::Type::VertexBuffer};
   QOpenGLBuffer ibo_ {QOpenGLBuffer::Type::IndexBuffer};
