@@ -1,6 +1,7 @@
 #pragma once
 
 #include "openglwidget.h"
+#include "sliders.hpp"
 
 #include <QElapsedTimer>
 #include <QOpenGLBuffer>
@@ -8,37 +9,57 @@
 #include <QOpenGLTexture>
 #include <QOpenGLVertexArrayObject>
 #include <QWindow>
+#include <QSlider>
+#include <QLabel>
+#include <QMouseEvent>
+#include <QKeyEvent>
+#include <QWheelEvent>
+#include <QHBoxLayout>
 
 class Window : public OpenGLWidget
 {
-    Q_OBJECT
+  Q_OBJECT
 
 public:
-    Window();
-    ~Window();
+  Window();
+  ~Window();
 
-    void onInit() override;
-    void onRender() override;
-    void onResize(size_t width, size_t height) override;
+  void onInit() final;
+  void onRender() final;
+  void onResize(size_t W, size_t H) final;
+
+  void keyPressEvent(QKeyEvent *Event) final;
+  void mousePressEvent(QMouseEvent *Event) final;
+  void mouseMoveEvent(QMouseEvent *Event) final;
+  void wheelEvent(QWheelEvent *Event) final;
 
 private:
-    QElapsedTimer timer_;
-    GLint colorUniform_ = -1;
-    float hue_ = 0;
+  std::unique_ptr<QLabel> FPSLabel;
 
-    GLint mvpUniform_ = -1;
+  static constexpr slider_config SlidersConfig[4]
+  {
+    {"Iterations:", 16, 16384, 1024, 16},
+    {"A:", -1000, 1000,  10, 1},
+    {"B:", -1000, 1000,  30, 1},
+    {"C:", -1000, 1000, 300, 1},
+  };
+  slider_panel Sliders {this, SlidersConfig};
 
-    QMatrix4x4 model_;
-    QMatrix4x4 view_;
-    QMatrix4x4 projection_;
+  QPointF LastMousePos {NAN, NAN};
 
-    QOpenGLBuffer vbo_{QOpenGLBuffer::Type::VertexBuffer};
-    QOpenGLBuffer ibo_{QOpenGLBuffer::Type::IndexBuffer};
-    QOpenGLVertexArrayObject vao_;
+  QVector2D Resolution {NAN, NAN};
+  QVector2D TexelSize {NAN, NAN};
+  QVector2D AspectRatio {NAN, NAN};
 
-    std::unique_ptr<QOpenGLTexture> texture_;
-    std::unique_ptr<QOpenGLShaderProgram> program_;
+  float FractalZoomCounter {0};
+  float FractalZoomFactor {std::log(1.05f)};
+  float FractalZoom {1.f};
+  QVector2D FractalCenter {0.f, 0.f};
+  QVector2D FractalExtent;
 
-    bool animated_ = true;
-    bool сolorAnimated_ = animated_;
+  QOpenGLBuffer vbo_ {QOpenGLBuffer::Type::VertexBuffer};
+  QOpenGLBuffer ibo_ {QOpenGLBuffer::Type::IndexBuffer};
+  QOpenGLVertexArrayObject vao_;
+
+  std::unique_ptr<QOpenGLShaderProgram> program_;
 };
