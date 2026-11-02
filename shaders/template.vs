@@ -1,16 +1,18 @@
+/* Meta information */
 #version 330 core
+#extension GL_ARB_separate_shader_objects : enable
+#extension GL_ARB_explicit_uniform_location : enable
 
-layout(location=0) in vec2 pos;
-layout(location=1) in vec3 col;
-layout(location=2) in vec2 tex;
+/* Direct inputs */
+layout(location = 0) in vec2 _in_pos;
 
-uniform mat4 mvp;
+/* Direct outputs */
+layout(location = 0) out vec2 _out_pos;
 
-out vec3 vert_col;
-out vec2 vert_tex;
 
-void main() {
-        vert_col = col;
-        vert_tex = tex;
-        gl_Position = mvp * vec4(pos.xy, 0.0, 1.0);
+/* Code */
+void main()
+{
+  _out_pos = _in_pos;
+  gl_Position = vec4(_in_pos, 0.0, 1.0);
 }

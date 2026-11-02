@@ -22,23 +22,16 @@ public:
     void onResize(size_t width, size_t height) override;
 
 private:
-    QElapsedTimer timer_;
-    GLint colorUniform_ = -1;
-    float hue_ = 0;
+  QElapsedTimer timer_;
+  float hue_ = 0;
 
-    GLint mvpUniform_ = -1;
+  QOpenGLBuffer vbo_{QOpenGLBuffer::Type::VertexBuffer};
+  QOpenGLBuffer ibo_{QOpenGLBuffer::Type::IndexBuffer};
+  QOpenGLVertexArrayObject vao_;
 
-    QMatrix4x4 model_;
-    QMatrix4x4 view_;
-    QMatrix4x4 projection_;
+  std::unique_ptr<QOpenGLTexture> texture_;
+  std::unique_ptr<QOpenGLShaderProgram> program_;
 
-    QOpenGLBuffer vbo_{QOpenGLBuffer::Type::VertexBuffer};
-    QOpenGLBuffer ibo_{QOpenGLBuffer::Type::IndexBuffer};
-    QOpenGLVertexArrayObject vao_;
-
-    std::unique_ptr<QOpenGLTexture> texture_;
-    std::unique_ptr<QOpenGLShaderProgram> program_;
-
-    bool animated_ = true;
-    bool сolorAnimated_ = animated_;
+  bool animated_ = true;
+  bool сolorAnimated_ = animated_;
 };
