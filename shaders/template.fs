@@ -5,13 +5,12 @@
 
 
 /* Inirect I/O */
-layout(location = 0) uniform sampler2D tex_2d;
-layout(location = 1) uniform vec2 aspect_ratio;
-layout(location = 2) uniform vec4 color;
-layout(location = 3) uniform vec4 center_n_extent;
+layout(location = 0) uniform vec4 center_n_extent;
+layout(location = 1) uniform vec3 frac_params;
+layout(location = 2) uniform vec2 texel_size;
 
 /* Direct inputs */
-layout(location = 0) in vec2 _in_pos;
+layout(location = 0) in vec2 _in_tex;
 
 /* Direct outputs */
 layout(location = 0) out vec4 _out_col;
@@ -23,14 +22,34 @@ void main()
   vec2 center = center_n_extent.xy;
   vec2 extent = center_n_extent.zw;
 
-  vec2 vert_tex = center + extent * _in_pos;
-  vec3 vert_col = vec3(0.5, 0.5, 0.5);
+  int max_iter = 4096;
+  float a = frac_params.x, b = frac_params.y, c = frac_params.z;
+  float texel = sqrt(max(texel_size.x, texel_size.y));
 
-  // TODO: Replace with fractal
-  vec4 texel = texture(tex_2d, vec2(vert_tex.x, 1.0 - vert_tex.y));
-  float greyscale_factor = dot(texel.rgb, vec3(0.21, 0.71, 0.07));
-  vec3 semi_greyscale = mix(vec3(greyscale_factor), vert_col.rgb, 0.7f);
-  vec3 animated_color = mix(color.rgb, semi_greyscale, 0.7f);
+  vec2 base_pos = _in_tex;
+  vec2 coord = vec2(0, 0);
 
-  _out_col = vec4(animated_color, 1.0);
+  float hits = 0;
+  float far_hits = 0;
+
+  for (int i = 0; i < max_iter; i++)
+  {
+    coord = vec2(coord.y - sign(coord.x) * sqrt(abs(b * coord.x - c)), a - coord.x);
+
+    float dist = distance(coord, base_pos) / texel / 3;
+    vec2 far_dist = abs(coord - center);
+
+    if ((far_dist.x < extent.x && far_dist.y < extent.y) || dist < 8)
+      far_hits += 1;
+
+    if (dist < 1)
+      hits += 1;
+    else if (dist < 3)
+    {
+      dist = (dist - 1) / 2;
+      hits += pow(1 - dist, 2);
+    }
+  }
+
+  _out_col = vec4(pow(hits / (far_hits + 1), 0.5), pow(hits / max_iter, 0.3), hits * 16 / max_iter, 1.0);
 }

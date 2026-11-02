@@ -30,12 +30,10 @@ public:
   void wheelEvent(QWheelEvent *Event) final;
 
 private:
-  QElapsedTimer timer_;
-  float hue_ = 0;
-
   QPointF LastMousePos {NAN, NAN};
 
   QVector2D Resolution {NAN, NAN};
+  QVector2D TexelSize {NAN, NAN};
   QVector2D AspectRatio {NAN, NAN};
 
   float FractalZoomCounter {0};
@@ -49,6 +47,5 @@ private:
   QOpenGLBuffer ibo_ {QOpenGLBuffer::Type::IndexBuffer};
   QOpenGLVertexArrayObject vao_;
 
-  std::unique_ptr<QOpenGLTexture> texture_;
   std::unique_ptr<QOpenGLShaderProgram> program_;
 };

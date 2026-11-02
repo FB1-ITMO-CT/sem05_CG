@@ -36,7 +36,6 @@ Window::Window()
 
 Window::~Window()
 {
-  texture_.reset();
   program_.reset();
 }
 
@@ -48,16 +47,9 @@ void Window::onInit()
   program_ = std::make_unique<QOpenGLShaderProgram>(this);
   program_->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/template.vs");
   program_->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/template.fs");
-  if (!program_->link()) {
-      qDebug() << "Ошибка линковки:" << program_->log();
-  }
+  if (!program_->link())
+    qDebug() << "Linking error:" << program_->log();
   program_->bind();
-
-  // Configure textures
-  texture_ = std::make_unique<QOpenGLTexture>(QImage(":/textures/cat.jpg"));
-  texture_->setMinMagFilters(QOpenGLTexture::Linear, QOpenGLTexture::Linear);
-  texture_->setWrapMode(QOpenGLTexture::WrapMode::Repeat);
-  program_->setUniformValue("tex_2d", 0);
 
   // Create VAO object
   vao_.create();
@@ -86,9 +78,6 @@ void Window::onInit()
   vbo_.release();
   ibo_.release();
 
-  // Start timer for animation (if needed)
-  timer_.start();
-
   // Еnable depth test and face culling
   glDisable(GL_DEPTH_TEST);
   glEnable(GL_CULL_FACE);
@@ -106,20 +95,14 @@ void Window::onRender()
     FractalZoom = std::exp(static_cast<float>(FractalZoomCounter) * FractalZoomFactor);
     FractalExtent = AspectRatio * FractalZoom;
 
+    TexelSize = FractalExtent * 2 / Resolution;
+
     FractalInfoUpdated = false;
   }
-  program_->setUniformValue(3, FractalCenter.x(), FractalCenter.y(), FractalExtent.x(), FractalExtent.y());
 
-  {
-    const auto dt {timer_.restart() / 1000.0f};
-    hue_ = std::fmod(hue_ + dt * (60.0f / 360.0f), 1.0f);
-
-    program_->setUniformValue(2, QColor::fromHsvF(hue_, 1.0, 1.0));
-  }
-
-  // Add textures
-  glActiveTexture(GL_TEXTURE0);
-  texture_->bind();
+  program_->setUniformValue(0, FractalCenter.x(), FractalCenter.y(), FractalExtent.x(), FractalExtent.y());
+  program_->setUniformValue(1, 1.f, 3.0f, 0.f);
+  program_->setUniformValue(2, TexelSize.x(), TexelSize.y());
 
   // Bind VAO
   vao_.bind();
@@ -130,7 +113,6 @@ void Window::onRender()
   // Release all
   vao_.release();
   program_->release();
-  texture_->release();
 
   update();
 }
