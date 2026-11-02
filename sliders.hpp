@@ -29,7 +29,8 @@ public:
   slider_panel(QOpenGLWidget *glWidget, std::span<const slider_config> configs) :
     QWidget {glWidget}
   {
-    setAutoFillBackground(true);
+    setAutoFillBackground(false);
+    setAttribute(Qt::WA_NoMousePropagation, true);
 
     Outer.reset(new QVBoxLayout(this));
     Outer->setContentsMargins(8, 8, 8, 8);
@@ -53,16 +54,19 @@ public:
 
       e->Title = std::make_unique<QLabel>(QString::fromUtf8(cfg.title), e->Row.get());
       e->Title->setMinimumWidth(titleWidth);
+      e->Title->setStyleSheet("color: white;");
 
       e->Slider = std::make_unique<QSlider>(Qt::Horizontal, e->Row.get());
       e->Slider->setRange(cfg.minimum, cfg.maximum);
       e->Slider->setSingleStep(cfg.step);
       e->Slider->setPageStep(cfg.step * 10);
       e->Slider->setValue(cfg.initial);
+      e->Slider->setAttribute(Qt::WA_NoMousePropagation, true);
 
       e->Value = std::make_unique<QLabel>(QString::number(cfg.initial), e->Row.get());
       e->Value->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
       e->Value->setMinimumWidth(fm.horizontalAdvance(QString::number(cfg.maximum)) + 8);
+      e->Value->setStyleSheet("color: white;");
 
       rowLayout->addWidget(e->Title.get());
       rowLayout->addWidget(e->Slider.get(), 1);

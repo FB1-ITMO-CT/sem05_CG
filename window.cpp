@@ -92,9 +92,9 @@ void Window::onRender()
 
   {
     float MaxIter = Sliders.Value(0);
-    float A = Sliders.Value(1);
-    float B = Sliders.Value(2);
-    float C = Sliders.Value(3);
+    float A = Sliders.Value(1) * 0.1;
+    float B = Sliders.Value(2) * 0.1;
+    float C = Sliders.Value(3) * 0.1;
     program_->setUniformValue(1, A, B, C, MaxIter);
   }
 

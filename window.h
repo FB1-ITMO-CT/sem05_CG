@@ -39,9 +39,9 @@ private:
   static constexpr slider_config SlidersConfig[4]
   {
     {"Iterations:", 16, 16384, 1024, 16},
-    {"A:", -64, 64,  1, 1},
-    {"B:", -64, 64,  3, 1},
-    {"C:", -64, 64, 30, 1},
+    {"A:", -1000, 1000,  10, 1},
+    {"B:", -1000, 1000,  30, 1},
+    {"C:", -1000, 1000, 300, 1},
   };
   slider_panel Sliders {this, SlidersConfig};
 
