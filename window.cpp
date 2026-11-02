@@ -166,7 +166,7 @@ void Window::wheelEvent(QWheelEvent *Event)
 
   QVector2D Mouse {static_cast<float>(LastMousePos.x()), static_cast<float>(LastMousePos.y())};
   Mouse = Mouse * 2 / Resolution - QVector2D {1.f, 1.f};
-  Mouse = Mouse * AspectRatio * FractalExtent;
+  Mouse = Mouse * FractalExtent;
 
   const auto BaseMouse {Mouse};
   Mouse /= FractalZoom;
