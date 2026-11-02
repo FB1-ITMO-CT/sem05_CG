@@ -1,6 +1,7 @@
 #pragma once
 
 #include "openglwidget.h"
+#include "sliders.hpp"
 
 #include <QElapsedTimer>
 #include <QOpenGLBuffer>
@@ -8,9 +9,12 @@
 #include <QOpenGLTexture>
 #include <QOpenGLVertexArrayObject>
 #include <QWindow>
+#include <QSlider>
+#include <QLabel>
 #include <QMouseEvent>
 #include <QKeyEvent>
 #include <QWheelEvent>
+#include <QHBoxLayout>
 
 class Window : public OpenGLWidget
 {
@@ -30,6 +34,17 @@ public:
   void wheelEvent(QWheelEvent *Event) final;
 
 private:
+  std::unique_ptr<QLabel> FPSLabel;
+
+  static constexpr slider_config SlidersConfig[4]
+  {
+    {"Iterations:", 16, 16384, 1024, 16},
+    {"A:", -64, 64,  1, 1},
+    {"B:", -64, 64,  3, 1},
+    {"C:", -64, 64, 30, 1},
+  };
+  slider_panel Sliders {this, SlidersConfig};
+
   QPointF LastMousePos {NAN, NAN};
 
   QVector2D Resolution {NAN, NAN};

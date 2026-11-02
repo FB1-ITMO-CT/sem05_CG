@@ -1,8 +1,6 @@
 #include "window.h"
 
 #include <array>
-#include <QLabel>
-#include <qevent.h>
 
 struct vertex
 {
@@ -18,19 +16,19 @@ constexpr vertex Vertices[] {
 
 constexpr GLuint Indices[] {0, 1, 2, 2, 1, 3};
 
-Window::Window()
+Window::Window() :
+  FPSLabel {new QLabel("FPS: 0", this)}
 {
   // Add label for FPS
-  auto* fpsLabel = new QLabel("FPS: 0", this);
-  fpsLabel->setStyleSheet("QLabel { color: white; }");
-  fpsLabel->setAttribute(Qt::WA_TransparentForMouseEvents);
-  fpsLabel->adjustSize();
-  fpsLabel->move(0, 0);
-  fpsLabel->raise();
+  FPSLabel->setStyleSheet("QLabel { color: white; }");
+  FPSLabel->setAttribute(Qt::WA_TransparentForMouseEvents);
+  FPSLabel->adjustSize();
+  FPSLabel->move(0, Sliders.sizeHint().height());
+  FPSLabel->raise();
 
-  connect(this, &Window::fpsUpdated, [fpsLabel](double fps) {
-    fpsLabel->setText(QString("FPS: %1").arg(fps, 0, 'f', 0));
-    fpsLabel->adjustSize();
+  connect(this, &Window::fpsUpdated, [this](double fps) {
+    FPSLabel->setText(QString("FPS: %1").arg(fps, 0, 'f', 0));
+    FPSLabel->adjustSize();
   });
 }
 
@@ -92,7 +90,13 @@ void Window::onRender()
 
   program_->setUniformValue(0, FractalCenter.x(), FractalCenter.y(), FractalExtent.x(), FractalExtent.y());
 
-  program_->setUniformValue(1, 1.f, 3.0f, 0.f);
+  {
+    float MaxIter = Sliders.Value(0);
+    float A = Sliders.Value(1);
+    float B = Sliders.Value(2);
+    float C = Sliders.Value(3);
+    program_->setUniformValue(1, A, B, C, MaxIter);
+  }
 
   TexelSize = FractalExtent * 2 / Resolution;
   program_->setUniformValue(2, TexelSize.x(), TexelSize.y());

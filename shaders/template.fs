@@ -6,7 +6,7 @@
 
 /* Inirect I/O */
 layout(location = 0) uniform vec4 center_n_extent;
-layout(location = 1) uniform vec3 frac_params;
+layout(location = 1) uniform vec4 frac_params;
 layout(location = 2) uniform vec2 texel_size;
 
 /* Direct inputs */
@@ -22,7 +22,7 @@ void main()
   vec2 center = center_n_extent.xy;
   vec2 extent = center_n_extent.zw;
 
-  int max_iter = 4096;
+  int max_iter = int(frac_params.w);
   float a = frac_params.x, b = frac_params.y, c = frac_params.z;
   float texel = sqrt(max(texel_size.x, texel_size.y));
 

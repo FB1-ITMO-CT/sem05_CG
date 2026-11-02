@@ -5,6 +5,8 @@
 # Source code
 !/
 !/*.cpp
+!/*.hpp
+!/*.c
 !/*.h
 !/shaders/
 !/shaders/*
