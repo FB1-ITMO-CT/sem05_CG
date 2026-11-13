@@ -55,3 +55,17 @@ Help students with their submission is the main goal of this repository. Do not 
 - Since we link with Qt dynamically don't forget to add `<qt-path>/<abi-arch>/bin` and `<qt-path>/<abi-arch>/plugins/platforms` to `PATH` variable.
 
 https://github.com/sadads1337/mse-gl-hw-template
+
+## Problem statement - HW1
+
+Фрактал
+
+### Простая часть (0.6 баллов)
+
+1. Отрисовать любую простую геометрию/функцию.
+1. Поддержать возможность зума и навигации (mouse scroll, mouse drag). Точка под курсором не должна съезжать.
+1. Поддержать возможность задавать на слайдере(ах) параметр(ы) геометрии/функции.
+
+### Сложная часть (0.4 баллов)
+
+Вместо геометрии/функции отрисовать фрактал (какой - см в ведомости в своей строке) с вычислением цвета на фрагментном шейдере. На слайдер(ы) навесить параметр(ы) фрактала.
